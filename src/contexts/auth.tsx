@@ -1,30 +1,50 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
-  authenticated: boolean;
-  user: {};
-  login: (username: string, password: string) => void;
-  logout: () => void;
-  children?: JSX.Element;
+  authenticated?: boolean;
+  loading?: boolean;
+  user?: {} | null;
+  login?: (username: string, password: string) => void;
+  logout?: () => void;
 };
 
 export const AuthContext = createContext<Props | null>(null);
 
-export const AuthProvider = ({ children }: Props) => {
+export const AuthProvider = ({ children }: { children: JSX.Element }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState({
     id: '',
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const dadosLogin = localStorage.getItem('user');
+    if (dadosLogin) {
+      setUser(JSON.parse(dadosLogin));
+    }
+
+    setLoading(false);
+  }, []);
+
   const login = (username: string, password: string) => {
+    const dadosLogin = {
+      id: '123',
+      username,
+    };
+
+    localStorage.setItem('user', JSON.stringify(dadosLogin));
+
     if (password === 'teste') {
-      setUser({ id: '123' });
+      setUser(dadosLogin);
       navigate('/');
     }
   };
 
   const logout = () => {
+    localStorage.removeItem('user');
     setUser({ id: '' });
+    navigate('/login');
   };
 
   return (
@@ -34,6 +54,7 @@ export const AuthProvider = ({ children }: Props) => {
         user,
         login,
         logout,
+        loading,
       }}
     >
       {children}

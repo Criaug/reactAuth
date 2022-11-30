@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../contexts/auth';
 
 const Home = () => {
+  const { logout } = useContext(AuthContext);
+  const handleLogout = () => {
+    logout();
+  };
   return (
     <div>
-      <Link to="/login">
-        <button>login</button>
-      </Link>
+      <button onClick={handleLogout}>logout</button>
     </div>
   );
 };
